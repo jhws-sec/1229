@@ -68,3 +68,151 @@ admin/HFish2021），请描述：1）攻击最频繁的攻击者ip；2）列取�
 ```
 使用DiskGenius打开，选择磁盘—打开虚拟磁盘文件，点击恢复文件，注意要有恢复已删除文件，点击开始
 文件夹前有垃圾桶的就是之前删除的文件
+```
+
+
+## 4、Linux 系统中 FTP 服务安全防护 
+创建 test 普通用户，然后给其设置一个的密码，并修改该登录 shell 为/bin/sh；最后将该用户禁用
+```
+sudo useradd test
+sudo passwd test
+sudo usermod -s /bin/sh test
+sudo usermod -L test
+```
+修改/etc/vstpd.conf 配置文件，关闭匿名用户，
+修改/etc/vstpd.conf 配置文件，限制本地用户只能在自己的家目录中活动，
+修改/etc/vstpd.conf 配置文件，设置每个 IP 的最大客户端连接数目为 5，
+```
+anonymous_enable=NO
+local_enable=YES
+chroot_local_user=YES
+max_per_ip=5
+```
+修改/etc/vstpd.conf 配置文件，设置服务监听端口为2121，设置客户端同时最大连接数为 100，设置匿名用户的家目录为/ftphome，禁止所有用户进行写操作。 
+```
+listen_port=2121
+max_clients=100
+anon_root=/ftphome
+write_enable=NO
+```
+
+## 5、url-rot13-base64 解密算法 
+密码学用于解决信息安全中的保密性，完整性，认证和不可否认性等问题。最初主要用于解决保密性。随着密码学技术的发展，逐渐应用到其它领域。常见的密码算法有很多，下 
+面按照要求对“VmFzYmV6bmd2YmElMjBGcnBoZXZnbCUyME5xenZhdmZnZW5nYmU=”进行解密。（没有特别说明加密算法采用默认设置）
+```
+1、打开cyberchef解码工具（或其他解码工具）https://cyberchef.org/
+2、将密文VmFzYmV6bmd2YmElMjBGcnBoZXZnbCUyME5xenZhdmZnZW5nYmU=
+复制到Input输入框中。
+3、然后在左侧依次搜索 From base64、ROT13、URL Decode，然后拖动到中间位置
+4、出现答案后，复制答案到提交框里提交。（注意看答案提交要求，可能会要求加flag{xxx}，或者把空格换成下划线等）
+```
+
+
+## 6、取证技术应用（重复） 
+（1）登入虚拟机（0f3f0c_网络与信息安全管理员高级工级_Win7_x64），双击“c:\tools\ 
+开启蜜罐.bat”，然后打开蜜罐设备管理页（https://miguan.test:4433/web/，账号密码： 
+admin/HFish2021），请描述：1）攻击最频繁的攻击者 ip；2）列取被攻击的蜜罐服务；3） 
+攻击者最常用的密码。 
+（2）利用电子取证技术恢复虚拟磁盘（c:\files\test.vhd）唯一分区中被恶意删除的机密 
+文件，并获取机密文件内容。 
+
+## 7、Linux 系统中 FTP 服务安全防护（重复）
+创建 test 普通用户，然后给其设置一个的密码，并修改该登录 shell 为/bin/sh；最后 
+将该用户禁用，修改/etc/vstpd.conf 配置文件，关闭匿名用户，修改/etc/vstpd.conf 配 
+置文件，限制本地用户只能在自己的家目录中活动，修改/etc/vstpd.conf 配置文件，设置 
+每个 IP 的最大客户端连接数目为 5，修改/etc/vstpd.conf 配置文件，设置服务监听端口为 
+2121，设置客户端同时最大连接数为 100，设置匿名用户的家目录为/ftphome，禁止所有用 
+户进行写操作。 
+
+## 8、url-rot13-base64 解密算法（重复）
+密码学用于解决信息安全中的保密性，完整性，认证和不可否认性等问题。最初主要用 
+于解决保密性。随着密码学技术的发展，逐渐应用到其它领域。常见的密码算法有很多，下 
+面按照要求对 
+“VmFzYmV6bmd2YmElMjBGcnBoZXZnbCUyME5xenZhdmZnZW5nYmU=”进行解密。（没有特别说明 
+加密算法采用默认设置） 
+
+
+## 9、数据安全管理 
+启动虚拟机。该虚拟机安装了 MySQL 数据库（MySQL 绑定地址为 192.168.101.103，服 
+务端口为 3306，用户名/密码为 root/root123），登录后请完成以下操作： 
+### (1) 查看 DATABASE idatabase 中的 customer 表，写出表中有多少条记录并对查询过程进行截图。
+``` 
+select count(*) from idatabase.customer;
+```
+
+### (2) 查看上述 customer 表中按 name、idnum 去重后涉及多少条记录，写出结果并对查询过程进行截图。 
+```
+select count(*) from (select distinct name,idnum  from idatabase.customer)a;
+```
+
+### (3) 将 customer 表中的 idnum 替换为 MD5 值，写出操作命令，并对替换前、后的表数据进行截图（截图中替换前后的 idnum 要能对应上）。 
+```
+alter table oc_config modify userid varchar(256);
+update customer set idnum=md5(idnum);
+```
+
+### (4) 将 customer 表中 phone 的第 4-7 位（从左边开始数）用“*”替换，写出操作命令， 并对替换前、后的表数据进行截图（截图中替换前后的 phone 要能对应上）。
+```
+select concat(left(`key`,3),'****',substr(`key`,8)), `key` from oc_config;
+update customer set phone=concat(left(`key`,3),'****',substr(`key`,8)); 
+ALTER TABLE table_name ADD COLUMN column_name data_type;
+ALTER TABLE table_name DROP COLUMN column_name;
+```
+
+
+## 10、数据安全处置
+请以管理员账户登录当前 Windows 系统，并按顺序执行以下操作： 
+①将 Sysmon.7z 解压（解压密码为"3 级 SysMon",压缩包里有帮助文档“Sysmon 帮助文 
+档.pdf”和 Sysmon 命令）。以管理员权限执行 Sysmon 命令，依次进行安装（Install）、更 
+新（Update configuration）为默认配置，并对命令和执行情况进行截图。
+sysmon -i
+sysmon -c 
+
+②打开 pdf 文档。在“事件查看器-应用程序和服务日志-Microsoft-Windows-Sysmon” 
+（以下简称“事件日志”）中，找到打开日志并截图，同时写出该日志 Event ID。 
+
+③关闭 pdf 文档。在事件日志中，找到关闭日志并截图，同时写出该日志 Event ID。 
+
+④通过 Sysmon 命令更新配置（配置文件为压缩包中的“Q4.xml”）。配置更新后，在“C:/test” 
+目录下创建、删除“OK.txt”文件。在事件日志中，找到创建、删除日志并截图（截图中应 
+体现创建和删除的文件名）。 
+
+## 11、Windows本地安全防护
+禁止系统在未登录的情况下关闭：
+在组策略编辑器（gpedit.msc）中，依次展开 “计算机配置” - “windows设置” - “安全设置” - “本地策略” - “安全选项”，双击 “关机：允许系统在未登录的情况下关闭”，选择 “已禁用”。
+
+不显示最后登录的用户名：
+在组策略编辑器中，依次展开 “计算机配置” - “Windows 设置” - “安全设置” - “本地策略” - “安全选项”，找到 “交互式登录：不显示最后的用户名”，设置为 “已启用”。
+
+不允许 SAM 账户的匿名枚举：
+在组策略编辑器中，同上，找到 “网络访问：不允许 SAM 账户的匿名枚举”，设置为 “已启用”。
+
+设置只有 Administrators 组用户才能从网络访问此计算机：
+在组策略编辑器中，同上，找到 “网络访问：本地账户的共享和安全模型”，设置为 “仅来宾 - 对本地用户进行身份验证，其身份为来宾”，然后在 “用户权限分配” 中找到 “从网络访问此计算机”，只保留 Administrators 组。
+
+禁止从远程系统强制关闭计算机：
+在组策略编辑器中，依次展开 “计算机配置” - “Windows 设置” - “安全设置” - “本地策略” - “用户权限分配”，找到 “从远程系统强制关机”删除所有用户组。
+
+禁止将未加密的密码发送到第三方的 SMB 服务器：
+在组策略编辑器中，依次展开 “计算机配置” - “Windows 设置” - “安全设置” - “本地策略” - “安全选项”，找到“Microsoft网络客户端：将未加密的密码发送到第三方SMB 服务器”，设置为 “已禁用”。
+
+禁止软盘复制并访问所有的驱动器和所有文件夹：
+在组策略编辑器中，同上，找到“恢复控制台：允许软盘复制并访问所有的驱动器和所有文件夹”，设置为 “已禁用”。
+
+设置只有 Administrators 用户组才能关闭系统：
+在组策略编辑器中，找到 “计算机配置” - “Windows 设置” - “安全设置” - “本地策略” - “用户权限分配” - “关闭系统”，只保留 Administrators 组。
+
+设置用户在登录系统时应该有 “Hello,World!!!” 的提示信息：
+在组策略编辑器中，依次展开 “计算机配置” - “Windows 设置” - “安全设置” - “本地策略” - “安全选项”，找到“交互式登录：试图登录的用户的消息标题”、“交互式登录：试图登录的用户的消息文本”，设置为“Hello,World!!!”  （win7测试有一个值为空都不会显示）
+
+设置远程用户非活动会话连接超时为 5 分钟：
+在组策略编辑器中，找到 “计算机配置” - “管理模板” - “Windows 组件” - “远程桌面服务” - “远程桌面会话主机” - “会话时间限制”，找到”设置活动但空闲的远程桌面服务会话的时间限制“设置相应的超时时间。
+
+删除可远程访问的注册表路径：
+在组策略编辑器中，找到 “计算机配置” - “Windows 设置” - “安全设置” - “本地策略” - “安全选项”，找到“网络访问：可远程访问的注册表路径”删除所有路径，下一条子路径最好也删除。
+
+禁止将 Everyone 权限应用于匿名用户：
+在组策略编辑器中，同上，找到 “网络访问：将Everyone权限应用于匿名用户”，设置为 “已禁用”。
+
+不允许存储网络身份验证的密码和凭据：
+在组策略编辑器中，同上，找到“网络访问：不允许存储网络身份验证的密码和凭据”，设置为“已启用”。
