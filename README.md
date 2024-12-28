@@ -141,6 +141,11 @@ admin/HFish2021），请描述：1）攻击最频繁的攻击者 ip；2）列取
 ## 9、数据安全管理 
 启动虚拟机。该虚拟机安装了 MySQL 数据库（MySQL 绑定地址为 192.168.101.103，服 
 务端口为 3306，用户名/密码为 root/root123），登录后请完成以下操作： 
+```
+mysql -uroot -proot123
+mysql -h 192.168.101.103 -uroot -proot123
+```
+
 ### (1) 查看 DATABASE idatabase 中的 customer 表，写出表中有多少条记录并对查询过程进行截图。
 ``` 
 select count(*) from idatabase.customer;
