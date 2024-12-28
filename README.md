@@ -240,10 +240,14 @@ chcon -t public_content_t /var/www/html/index2.html
 
 可选：持久化上下文类型设置
 上述使用chcon命令修改的文件上下文类型在系统重启后可能会恢复默认值。如果希望设置在重启后仍然有效，可以使用命令
+```
 semanage fcontext -a -t public_content_t /var/www/html/index2.html
-，将修改后的上下文类型持久化到 SELinux 的策略中。
+```
+将修改后的上下文类型持久化到 SELinux 的策略中。
+```
 semanage fcontext -a -t httpd_sys_content_t "/var/www/html/index.html"
 semanage fcontext -a -t default_t "/var/www/html/index2.html"
 restorecon -Rv /var/www/html/
 ls -Z
+```
 需要全路径，执行完之后再ls -Z
