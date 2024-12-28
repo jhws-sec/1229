@@ -211,8 +211,39 @@ sysmon -c
 删除可远程访问的注册表路径：
 在组策略编辑器中，找到 “计算机配置” - “Windows 设置” - “安全设置” - “本地策略” - “安全选项”，找到“网络访问：可远程访问的注册表路径”删除所有路径，下一条子路径最好也删除。
 
-禁止将 Everyone 权限应用于匿名用户：
-在组策略编辑器中，同上，找到 “网络访问：将Everyone权限应用于匿名用户”，设置为 “已禁用”。
 
-不允许存储网络身份验证的密码和凭据：
-在组策略编辑器中，同上，找到“网络访问：不允许存储网络身份验证的密码和凭据”，设置为“已启用”。
+## 12、selinux 权限管理 
+通过 selinux 设置文件权限，限制 web 访问，
+在/var/www/html 下，新建 index.html、index2.html， 
+使 index.html 可以通过 web 访问，index2.html 不可以通过 web 访问。
+
+sestatus
+
+### 查看文件的 SELinux 属性的方法
+使用 ls -Z 命令
+```
+#getenforce
+[root@localhost html]# getenforce
+Enforcing
+```
+编辑/etc/selinux/config文件，将SELINUX=enforcing，然后重启系统使设置生效。
+
+### 设置文件的上下文类型
+在 SELinux 中，文件的访问权限不仅取决于传统的文件权限位，还取决于文件的上下文类型。对于/var/www/html目录下的文件，默认的上下文类型通常为httpd_sys_content_t，允许被 HTTP 服务访问。
+对于index.html文件，保持其默认的上下文类型即可，确保它可以被正常访问。
+对于index2.html文件，需要修改其上下文类型，使其不能被 HTTP 服务访问。可以使用命令
+```
+chcon -t public_content_t /var/www/html/index2.html
+```
+或者 default_t
+，将其上下文类型更改为public_content_t，该类型通常不允许被 HTTP 服务访问。
+
+可选：持久化上下文类型设置
+上述使用chcon命令修改的文件上下文类型在系统重启后可能会恢复默认值。如果希望设置在重启后仍然有效，可以使用命令
+semanage fcontext -a -t public_content_t /var/www/html/index2.html
+，将修改后的上下文类型持久化到 SELinux 的策略中。
+semanage fcontext -a -t httpd_sys_content_t "/var/www/html/index.html"
+semanage fcontext -a -t default_t "/var/www/html/index2.html"
+restorecon -Rv /var/www/html/
+ls -Z
+需要全路径，执行完之后再ls -Z
